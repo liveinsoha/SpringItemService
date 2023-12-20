@@ -6,8 +6,9 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+//스프링이 없는 테스트이다
 class ItemRepositoryTest {
-    ItemRepository itemRepository = ItemRepository.getInstance();
+    ItemRepository itemRepository = new ItemRepository();
 
     @AfterEach
     void afterEach() {
@@ -39,8 +40,8 @@ class ItemRepositoryTest {
         itemRepository.update(item.getId(), "qwe", 100, 10);
         Item updatedItem = itemRepository.findById(item.getId());
 
-        assertThat(updatedItem.getName()).isEqualTo("qwe");
+        assertThat(updatedItem.getItemName()).isEqualTo("qwe");
         assertThat(updatedItem.getPrice()).isEqualTo(100);
-        assertThat(updatedItem.getquantity()).isEqualTo(10);
+        assertThat(updatedItem.getQuantity()).isEqualTo(10);
     }
 }

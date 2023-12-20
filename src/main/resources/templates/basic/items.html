@@ -31,8 +31,8 @@
             </thead>
             <tbody>
             <tr th:each="item : ${items}">
-                <td><a href="item.html" th:href="@{/basic/items/{itemId}
-(itemId=${item.id})}" th:text="${item.id}">회원id</a></td>
+                <td><a href="item.html" th:href="@{/basic/items/{itemId} (itemId=${item.id})}"
+                       th:text="${item.id}">회원id</a></td>
                 <td><a href="item.html" th:href="@{|/basic/items/${item.id}|}"
                        th:text="${item.itemName}">상품명</a></td>
                 <td th:text="${item.price}">10000</td>
@@ -44,3 +44,26 @@
 </div> <!-- /container -->
 </body>
 </html>
+
+<!--th:href="@{/css/bootstrap.min.css}"`
+`href="value1"` 을 `th:href="value2"` 의 값으로 변경한다.
+타임리프 뷰 템플릿을 거치게 되면 원래 값을 `th:xxx` 값으로 변경한다. 만약 값이 없다면 새로 생성한다.
+HTML을 그대로 볼 때는 `href` 속성이 사용되고, 뷰 템플릿을 거치면 `th:href` 의 값이 `href` 로 대체되면서
+동적으로 변경할 수 있다.
+대부분의 HTML 속성을 `th:xxx` 로 변경할 수 있다.-->
+<!--
+       URL 링크 표현식 - @{...}**,
+`th:href="@{/css/bootstrap.min.css}"`
+`@{...}` : 타임리프는 URL 링크를 사용하는 경우 `@{...}` 를 사용한다. 이것을 URL 링크 표현식이라 한다.
+-->
+<!--
+             `<td th:text="${item.price}">10000</td>`
+모델에 포함된 값(items)이나, 타임리프 변수(item)로 선언한 값을 조회할 수 있다.
+프로퍼티 접근법을 사용한다. ( `item.getPrice()` )-->
+<!--
+내용 변경 - th:text**
+`<td th:text="${item.price}">10000</td>`
+내용의 값을 `th:text` 의 값으로 변경한다.
+여기서는 10000을 `${item.price}` 의 값으로 변경한다
+-->
+

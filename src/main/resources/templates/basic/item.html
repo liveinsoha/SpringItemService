@@ -1,9 +1,9 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <link href="../css/bootstrap.min.css"
-          th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
     <style>
         .container {
         max-width: 560px;
@@ -18,35 +18,40 @@
     <div>
         <label for="itemId">상품 ID</label>
         <input type="text" id="itemId" name="itemId" class="form-control"
-               value="1" th:value="${item.id}" readonly>
+               th:value="${item.id}"
+               value="1" readonly>
     </div>
     <div>
         <label for="itemName">상품명</label>
         <input type="text" id="itemName" name="itemName" class="form-control"
-               value="상품A" th:value="${item.itemName}" readonly>
+               th:value="${item.itemName}"
+               value="상품A" readonly>
     </div>
     <div>
         <label for="price">가격</label>
         <input type="text" id="price" name="price" class="form-control"
-               value="10000" th:value="${item.price}" readonly>
+               th:value="${item.price}"
+               value="10000" readonly>
     </div>
     <div>
         <label for="quantity">수량</label>
         <input type="text" id="quantity" name="quantity" class="form-control"
-               value="10" th:value="${item.quantity}" readonly>
+               th:value="${item.quantity}"
+               value="10" readonly>
     </div>
     <hr class="my-4">
     <div class="row">
         <div class="col">
             <button class="w-100 btn btn-primary btn-lg"
-                    onclick="location.href='editForm.html'"
-                    th:onclick="|location.href='@{/basic/items/{itemId}/edit(itemId=${item.id})}'|" type="button">상품 수정</button>
+                    th:onclick="|location.href='@{|/basic/items/${item.id}/edit|}'|"
+                    onclick="location.href='editForm.html'" type="button">상품 수정
+            </button>
         </div>
         <div class="col">
             <button class="w-100 btn btn-secondary btn-lg"
-                    onclick="location.href='items.html'"
-                    th:onclick="|location.href='@{/basic/items}'|"
-                    type="button">목록으로</button>
+                    th:onclick = "|location.href='@{/basic/items}'|"
+                    onclick="location.href='items.html'" type="button">목록으로
+            </button>
         </div>
     </div>
 </div> <!-- /container -->

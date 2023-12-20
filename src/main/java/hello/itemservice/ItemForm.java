@@ -9,7 +9,7 @@ import lombok.Setter;
 public class ItemForm {
 
     private String itemName;
-    private int price;
-    private int quantity;
+    private Integer price;
+    private Integer quantity;
 
 }
