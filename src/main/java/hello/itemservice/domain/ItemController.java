@@ -8,13 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/basic/items")
+@RequestMapping("/basic/items")//공통경로는 여기있다
 public class ItemController {
 
     /**
@@ -50,7 +51,12 @@ public class ItemController {
         return "basic/addForm";
     }
 
-    //@PostMapping("/add") //등록하기
+    /**
+     * 상품 등록 처리 이후에 뷰 템플릿이 아니라 상품 상세 화면으로 리다이렉트 하도록 코드를 작성해보자.
+     * 이런 문제 해결 방식을 `PRG Post/Redirect/Get` 라 한다.
+     */
+
+    // @PostMapping("/add") //등록하기
     public String addItemV1(@RequestParam String itemName,
                             @RequestParam Integer price,
                             @RequestParam Integer quantity, Model model) {
@@ -58,7 +64,7 @@ public class ItemController {
         Item item = new Item(itemName, price, quantity);
         itemRepository.save(item);
         model.addAttribute("item", item);
-        return "basic/item"; //저장하고 저장 객체의 정보를 모델에 담아 상품상세 뷰로 이동
+        return "redirect:/basic/items/" + item.getId(); //저장하고 저장 객체의 정보를 모델에 담아 상품상세 뷰로 이동
     }
 
     /**
@@ -74,7 +80,7 @@ public class ItemController {
      * `model.addAttribute("hello", item);` 모델에 `hello` 이름으로 저장
      * **
      */
-    @PostMapping("/add") //등록하기
+    //@PostMapping("/add") //등록하기
     public String addItemV2(@ModelAttribute("item") Item item, Model model) {
         log.info("log info : addItemV2 method = post");
         //Item item = new Item(itemForm.getItemName(), itemForm.getPrice(), itemForm.getQuantity());
@@ -82,6 +88,60 @@ public class ItemController {
         //model.addAttribute("item", item);
         return "basic/item"; //저장하고 저장 객체의 정보를 모델에 담아 상품상세 뷰로 이동
     }
+
+    //@PostMapping("/add") //등록하기
+    public String addItemV3(@ModelAttribute Item item) { //Model객체를 http로부터 따로 넘겨받지 않아도, @ModelAttribute애노테이션이 자동으로 Model을 만들어 뷰로 넘긴다.
+        log.info("log info : addItemV3 method = post");
+        itemRepository.save(item);
+        //model.addAttribute("item", item);
+        return "basic/item"; //저장하고 저장 객체의 정보를 모델에 담아 상품상세 뷰로 이동
+    }
+
+    //@PostMapping("/add") //등록하기
+    public String addItemV4(Item item) { //@ModelAttribute애노테이션 생략 가능.(과하다)
+        log.info("log info : addItemV4 method = post");
+        itemRepository.save(item);
+        //model.addAttribute("item", item);
+        return "basic/item"; //저장하고 저장 객체의 정보를 모델에 담아 상품상세 뷰로 이동
+    }
+
+
+   // @PostMapping("/add") //등록하기 쿼리파라미턱를 @ModelAttribute로 받는다. 객체의 필드명이 쿼리 파리미터명이랑 같아야 한다.
+    public String addItemV5(@ModelAttribute ItemForm itemForm) {
+        log.info("log info : addItemV5 method = post");
+        Item item = new Item(itemForm.getItemName(), itemForm.getPrice(), itemForm.getQuantity());
+        itemRepository.save(item);
+        return "redirect:/basic/items/" + item.getId(); //저장하고 저장 객체의 정보를 모델에 담아 상품상세 뷰로 이동
+    }//상품등록을 하고 상품 상세를 get으로 다시 요청한 거랑 똑같다.
+
+
+    /**
+     * **RedirectAttributes**
+     * `RedirectAttributes` 를 사용하면 URL 인코딩도 해주고, `pathVariable` , 쿼리 파라미터까지 처리해준다.
+     * `redirect:/basic/items/{itemId}`
+     * pathVariable 바인딩: `{itemId}`
+     * 나머지는 쿼리 파라미터로 처리: `?status=true`
+     */
+    @PostMapping("/add") //등록하기 쿼리파라미턱를 @ModelAttribute로 받는다. 객체의 필드명이 쿼리 파리미터명이랑 같아야 한다.
+    public String addItemV6(@ModelAttribute ItemForm itemForm, RedirectAttributes redirectAttributes) {
+        log.info("log info : addItemV6 method = post");
+        Item item = new Item(itemForm.getItemName(), itemForm.getPrice(), itemForm.getQuantity());
+        itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", item.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/basic/items/{itemId}"; //저장하고 저장 객체의 정보를 모델에 담아 상품상세 뷰로 이동
+    }
+
+    /**
+     * 상품등록을 하고 상품 상세를 get으로 다시 요청한 거랑 똑같다.
+     *  리다이렉트하고 그 뷰까지 redirectAttribute가 값을 가져간다. 그 뷰에서 파라미터 status를 이용한다.
+     * `${param.status}` : 타임리프에서 쿼리 파라미터를 편리하게 조회하는 기능
+     * 원래는 컨트롤러에서 모델에 직접 담고 값을 꺼내야 한다. 그런데 쿼리 파라미터는 자주 사용해서 타임리프
+     * 에서 직접 지원한다.
+     */
+
+
+
 
     @GetMapping("/{itemId}")//상품 상세 Gradle로 빌드해야 PathVariable value속성 생략가능핮다.
     public String itemDetail(@PathVariable Long itemId, Model model) {
@@ -91,9 +151,9 @@ public class ItemController {
         return "basic/item";
     }
 
-    @GetMapping("/{itemId}/edit")//상품 수정 폼
-    public String updateItemForm(@PathVariable Long itemId, Model model) {
-        log.info("log info : updateItemForm method = get");
+    @GetMapping("/{itemId}/edit")//상품 수정 폼 보여주기(원래의 상태를 표시하기 위해 뷰로 모델을 넘긴다.)
+    public String updateForm(@PathVariable Long itemId, Model model) {
+        log.info("log info : updateForm method = get");
         Item findItem = itemRepository.findById(itemId);
         model.addAttribute("item", findItem);
         return "basic/editForm";
